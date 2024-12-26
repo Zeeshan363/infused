@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { BookingModule } from './booking/booking.module';
 import { ScheduleMeetingModule } from './schedule-meeting/schedule-meeting.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import { AppointmentModule } from './appointment/appointment.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { MongooseModule } from '@nestjs/mongoose';
     }),
     BookingModule,
     ScheduleMeetingModule,
+    AppointmentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
