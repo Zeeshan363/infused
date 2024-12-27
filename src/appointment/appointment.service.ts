@@ -6,6 +6,7 @@ import {
   AppointmentDocument,
 } from './entities/appointment.entity';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class AppointmentService {
@@ -24,6 +25,7 @@ export class AppointmentService {
   constructor(
     @InjectModel(Appointment.name)
     private appointmentModel: Model<AppointmentDocument>,
+    private readonly emailService: EmailService,
   ) {}
 
   async create(
@@ -39,7 +41,21 @@ export class AppointmentService {
     }
 
     const appointment = new this.appointmentModel(createAppointmentDto);
-    return appointment.save();
+    appointment.save();
+
+    try {
+      await this.emailService.sendClientConfirmation(
+        createAppointmentDto.email,
+        createAppointmentDto,
+      );
+
+      await this.emailService.sendOwnerNotification(createAppointmentDto);
+
+      return await appointment.save();
+    } catch (error) {
+      console.error('Error in appointment creation:', error);
+      throw new Error('Failed to create appointment');
+    }
   }
 
   async getAvailableSlots(date: string): Promise<any[]> {
